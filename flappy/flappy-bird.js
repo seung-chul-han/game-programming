@@ -69,7 +69,11 @@ let gameOver = false;
 
 const update = () => {
 	requestAnimationFrame(update);
-	if (gameOver) return;
+
+	if (gameOver) {
+		context.fillText('Game Over', 5, 90);
+		return;
+	}
 
 	context.clearRect(0, 0, board.width, board.height);
 
@@ -106,10 +110,7 @@ const update = () => {
 	}
 
 	// score
-	context.fillStyle = 'white';
-	context.font = '45px sans-serif';
 	context.fillText(score, 5, 45);
-	console.log('pipeArray', pipeArray);
 };
 
 const detectCollision = (a, b) => {
@@ -132,6 +133,8 @@ const init = () => {
 	board.width = boardWidth;
 	board.height = boardHeight;
 	context = board.getContext('2d');
+	context.fillStyle = 'white';
+	context.font = '45px sans-serif';
 
 	// draw flappy bird
 	// context.fillStyle = 'green';
