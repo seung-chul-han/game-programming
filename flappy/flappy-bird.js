@@ -124,8 +124,17 @@ const detectCollision = (a, b) => {
 
 const moveBird = (e) => {
 	if (e.code !== 'Space') return;
+
 	// jump
 	velocityY = -6;
+
+	// reset Game
+	if (gameOver) {
+		bird.y = birdY;
+		pipeArray.length = 0;
+		score = 0;
+		gameOver = false;
+	}
 };
 
 const init = () => {
