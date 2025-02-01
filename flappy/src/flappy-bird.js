@@ -1,5 +1,5 @@
 import pipeBottom from './images/bottompipe.png';
-import birdImg from './images/flappybird.gif';
+import birdImg from './images/flappy-sprites.png';
 import pipeTop from './images/toppipe.png';
 import BgSound from './jump-sound.mp3';
 import './style.css';
@@ -18,11 +18,14 @@ let gameOver = false;
 let context = null;
 let score = 0;
 
-// 408 // 228
+// 408 // 288
 const bird = {
 	img: new Image(),
+	originWidth: 408,
+	originHeight: 288,
 	width: 34,
-	height: 19,
+	height: 24,
+	spriteLength: 4,
 	x: config.width / config.divRow,
 	y: config.height / config.divCol,
 };
@@ -77,6 +80,8 @@ const detectedCollision = (bird, pipe) => {
 	);
 };
 
+let gameFrame = 0;
+const staggerFrame = 8;
 const update = (timestamp) => {
 	animId = requestAnimationFrame(update);
 
@@ -95,8 +100,28 @@ const update = (timestamp) => {
 	config.velocityY += config.gravity;
 
 	bird.y = Math.max(bird.y + config.velocityY, 0);
-	context.drawImage(bird.img, bird.x, bird.y, bird.width, bird.height);
 
+	const position = Math.floor(gameFrame / staggerFrame) % bird.spriteLength;
+
+	context.drawImage(
+		bird.img,
+		position * bird.originWidth,
+		0,
+		bird.originWidth,
+		bird.originHeight,
+		bird.x,
+		bird.y,
+		bird.width,
+		bird.height
+	);
+
+	// if (gameFrame % staggerFrame === 0) {
+	// 	frameX += 1;
+	// }
+
+	// if (frameX > bird.spriteLength - 1) frameX = 0;
+
+	gameFrame += 1;
 	// gameOver
 	if (bird.y + bird.height >= config.height) {
 		gameOver = true;
@@ -135,12 +160,16 @@ const update = (timestamp) => {
 
 const moveBird = (e) => {
 	if (gameOver && e.code === 'Enter') {
-		console.log('game over moveBird');
 		bird.y = config.height / config.divCol;
 		score = 0;
 		pipeList.length = 0;
 		gameOver = false;
-		update();
+		init();
+		return;
+	}
+
+	if (gameOver && e.code !== 'Enter') {
+		return;
 	}
 
 	if (!gameOver && e.code !== 'Space') return;
@@ -157,10 +186,22 @@ const init = () => {
 
 	context = board.getContext('2d');
 
+	context.fillRect(bird.x, bird.y, bird.width, bird.height);
+
 	// bird
 	bird.img.src = birdImg;
 	bird.img.addEventListener('load', () => {
-		context.drawImage(bird.img, bird.x, bird.y, bird.width, bird.height);
+		context.drawImage(
+			bird.img,
+			0,
+			0,
+			bird.originWidth,
+			bird.originHeight,
+			bird.x,
+			bird.y,
+			bird.width,
+			bird.height
+		);
 	});
 
 	pipe.img.top.src = pipeTop;
